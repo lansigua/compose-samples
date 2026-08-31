@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>跨境转账省钱比对工具</title>
+    <style>
+        body { font-family: -apple-system, system-ui, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        .card { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 420px; box-sizing: border-box; }
+        h2 { text-align: center; color: #1c1c1e; margin-top: 0; font-size: 22px; margin-bottom: 24px; }
+        .tab-group { display: flex; background: #e3e3e6; border-radius: 12px; padding: 3px; margin-bottom: 24px; }
+        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 9px; font-weight: bold; color: #636366; font-size: 14px; transition: all 0.2s; }
+        .tab.active { background: white; color: #007aff; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #3a3a3c; font-size: 14px; font-weight: 500; }
+        input { width: 100%; padding: 14px; border: 1px solid #d1d1d6; border-radius: 10px; background: #f2f2f7; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.2s; }
+        input:focus { border-color: #007aff; background: white; }
+        button { width: 100%; padding: 16px; background: #007aff; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,122,255,0.2); }
+        button:hover { background: #0063cc; }
+        #result { margin-top: 24px; padding: 18px; background: #f2f2f7; border-radius: 12px; border-left: 5px solid #007aff; white-space: pre-line; font-size: 15px; color: #1c1c1e; line-height: 1.6; display: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>跨境转账省钱比对工具</h2>
+        <div class="tab-group">
+            <div id="tab-cny" class="tab active" onclick="switchMode(true)">🇨🇳 人民币 ➔ 🇮🇩 印尼盾</div>
+            <div id="tab-idr" class="tab" onclick="switchMode(false)">🇮🇩 印尼盾 ➔ 🇨🇳 人民币</div>
+        </div>
+        <div class="input-group">
+            <label id="amount-label">输入汇出金额 (CNY)</label>
+            <input type="number" id="amount" placeholder="例如: 5000">
+        </div>
+        <div class="input-group">
+            <label>输入当前参考汇率 (1 CNY = ? IDR)</label>
+            <input type="number" id="rate" step="0.01" placeholder="例如: 2150.5">
+        </div>
+        <button onclick="calculate()">开始精算比对</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let isCnyToIdr = true;
+        const BANK_FIXED_FEE_CNY = 150.0;
+        const BANK_SPREAD = 0.012;
+        const TOPREMIT_FIXED_FEE_IDR = 100000.0;
+        const TOPREMIT_SPREAD = 0.004;
+
+        function switchMode(mode) {
+            isCnyToIdr = mode;
+            document.getElementById('tab-cny').classList.toggle('active', mode);
+            document.getElementById('tab-idr').classList.toggle('active', !mode);
+            document.getElementById('amount-label').innerText = mode ? '输入汇出金额 (CNY)' : '输入汇出金额 (IDR)';
+            document.getElementById('amount').value = '';
+            document.getElementById('rate').value = '';
+            document.getElementById('result').style.display = 'none';
+        }
+
+        function calculate() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const userRate = parseFloat(document.getElementById('rate').value);
+            const resultDiv = document.getElementById('result');
+
+            if (!amount || amount <= 0 || !userRate || userRate <= 0) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '⚠️ 请输入有效的转账金额和当前参考汇率';
+                return;
+            }
+
+            let text = '';
+            if (isCnyToIdr) {
+                const bankRate = userRate * (1 - BANK_SPREAD);
+                const bankReceivedIdr = (amount - BANK_FIXED_FEE_CNY) * bankRate;
+                const topremitRate = userRate * (1 - TOPREMIT_SPREAD)
+                const topremitReceivedIdr = (amount - 50.0) * topremitRate;
+                const diff = Math.abs(bankReceivedIdr - topremitReceivedIdr);
+                const winner = topremitReceivedIdr > bankReceivedIdr ? '【Topremit】' : '【银行直转】';
+                
+                text = `📊 <b>[参考汇率]</b> 1 CNY = ${userRate.toFixed(2)} IDR\n` +
+                       `----------------------------------\n` +
+                       `● <b>银行直转最终到账:</b>\n  ${Math.round(bankReceivedIdr).toLocaleString()} IDR\n  <small style="color:#666;">(已扣除约￥150手续费及点差)</small>\n\n` +
+                       `● <b>Topremit 最终到账:</b>\n  ${Math.round(topremitReceivedIdr).toLocaleString()} IDR\n  <small style="color:#666;">(享受更优平台汇率)</small>\n` +
+                       `----------------------------------\n` +
+                       `💡 <b>结论:</b> <span style="color:#007aff;font-weight:bold;">${winner}</span> 更省钱！\n` +
+                       `收款人可多收到约: <span style="color:#28a745;font-weight:bold;">${Math.round(diff).toLocaleString()} IDR</span>`;
+            } else {
+                const baseCnyRate = 1 / userRate;
+                const topremitRate = baseCnyRate * (1 - TOPREMIT_SPREAD);
+                const topremitReceivedCny = (amount - TOPREMIT_FIXED_FEE_IDR) * topremitRate;
+                const bankRate = baseCnyRate * (1 - BANK_SPREAD);
+                const bankReceivedCny = (amount - 300000.0) * bankRate;
+                const diff = Math.abs(bankReceivedCny - topremitReceivedCny);
+                const winner = topremitReceivedCny > bankReceivedCny ? '【Topremit】' : '【银行直转】';
+
+                text = `📊 <b>[参考汇率]</b> 10k IDR = ${(baseCnyRate * 10000).toFixed(4)} CNY\n` +
+                       `----------------------------------\n` +
+                       `● <b>Topremit 最终到账:</b>\n  ￥${topremitReceivedCny.toFixed(2)}\n  <small style="color:#666;">(已扣除 100,000 IDR 固定手续费)</small>\n\n` +
+                       `● <b>银行直转最终到账:</b>\n  ￥${bankReceivedCny.toFixed(2)}\n  <small style="color:#666;">(已扣除境外预估电汇费)</small>\n` +
+                       `----------------------------------\n` +
+                       `💡 <b>结论:</b> <span style="color:#007aff;font-weight:bold;">${winner}</span> 更省钱！\n` +
+                       `您可多收到约: <span style="color:#28a745;font-weight:bold;">￥${diff.toFixed(2)}</span>`;
+            }
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = text;
+        }
+    </script>
+</body>
+</html>
