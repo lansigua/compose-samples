@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>跨境转账省钱比对工具(多币种版)</title>
+    <title>跨境转账省钱比对工具(多币种精算版)</title>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
         .card { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 420px; box-sizing: border-box; }
@@ -29,11 +29,11 @@
         
         <!-- 1. 选择转账方向 -->
         <div class="tab-group">
-            <div id="tab-out" class="tab active" onclick="switchDirection(true)">外币 ➔ 🇨🇳 人民币(结汇回国)</div>
-            <div id="tab-in" class="tab" onclick="switchDirection(false)">🇨🇳 人民币 ➔ 外币(外汇输出)</div>
+            <div id="tab-out" class="tab active" onclick="switchDirection(true)">外币 ➔ 人民币(结汇回国)</div>
+            <div id="tab-in" class="tab" onclick="switchDirection(false)">人民币 ➔ 外币(外汇输出)</div>
         </div>
 
-        <!-- 2. 选择目标/源头货币 -->
+        <!-- 2. 选择外币币种 -->
         <label>选择对比的外币币种：</label>
         <div class="radio-group">
             <label class="radio-item">
@@ -46,14 +46,14 @@
             </label>
         </div>
 
-        <!-- 3. 输入框 -->
+        <!-- 3. 转账金额和参考汇率输入框 -->
         <div class="input-group">
             <label id="amount-label">输入汇出金额</label>
-            <input type="number" id="amount" placeholder="输入数字">
+            <input type="number" id="amount" placeholder="请输入要转账的数字金额">
         </div>
         <div class="input-group">
             <label id="rate-label">输入当前参考汇率</label>
-            <input type="number" id="rate" step="0.0001" placeholder="根据外币类型输入">
+            <input type="number" id="rate" step="0.0001" placeholder="请输入当前的市场参考价">
         </div>
 
         <button onclick="calculate()">开始精算比对</button>
@@ -61,16 +61,15 @@
     </div>
 
     <script>
-        let isTransferToCny = true; // true: 汇款回中国, false: 人民币汇出国外
+        let isTransferToCny = true; 
 
-        // 各种费率常量配置
-        const BANK_FIXED_FEE_CNY = 150.0;   // 银行国内汇出固定电汇费
-        const BANK_SPREAD = 0.012;          // 银行点差损耗 1.2%
+        const BANK_FIXED_FEE_CNY = 150.0;   
+        const BANK_SPREAD = 0.012;          
         
-        const TOPREMIT_FEE_IDR_TO_CNY = 100000.0; // Topremit印尼盾转中国固定手续费
-        const TOPREMIT_FEE_USD_TO_CNY = 5.0;      // Topremit美元转中国固定手续费 [参考1]
-        const TOPREMIT_FEE_CNY_TO_USD = 35.0;     // Topremit人民币转境外美元手续费预估
-        const TOPREMIT_SPREAD = 0.004;            // Topremit点差损耗 0.4%
+        const TOPREMIT_FEE_IDR_TO_CNY = 100000.0; 
+        const TOPREMIT_FEE_USD_TO_CNY = 5.0;      
+        const TOPREMIT_FEE_CNY_TO_USD = 35.0;     
+        const TOPREMIT_SPREAD = 0.004;            
 
         function switchDirection(direction) {
             isTransferToCny = direction;
@@ -89,11 +88,9 @@
             document.getElementById('result').style.display = 'none';
 
             if (isTransferToCny) {
-                // 外币转人民币
                 amountLabel.innerText = `输入汇出金额 (${currency})`;
                 rateLabel.innerText = currency === 'IDR' ? '输入参考汇率 (1 CNY = ? IDR)' : '输入参考汇率 (1 USD = ? CNY)';
             } else {
-                // 人民币转外币
                 amountLabel.innerText = '输入汇出金额 (CNY)';
                 rateLabel.innerText = currency === 'IDR' ? '输入参考汇率 (1 CNY = ? IDR)' : '输入参考汇率 (1 CNY = ? USD)';
             }
@@ -114,55 +111,53 @@
             let text = '';
 
             if (isTransferToCny) {
-                // ==========================================
-                // 【场景：外币转回中国结汇成人民币 CNY】
-                // ==========================================
                 if (currency === 'IDR') {
-                    // 印尼盾转人民币
                     const baseCnyRate = 1 / userRate;
                     const topremitReceivedCny = (amount - TOPREMIT_FEE_IDR_TO_CNY) * baseCnyRate * (1 - TOPREMIT_SPREAD);
-                    const bankReceivedCny = (amount - 300000.0) * baseCnyRate * (1 - BANK_SPREAD); // 银行扣30万印尼盾
+                    const bankReceivedCny = (amount - 300000.0) * baseCnyRate * (1 - BANK_SPREAD);
                     const diff = Math.abs(bankReceivedCny - topremitReceivedCny);
                     const winner = topremitReceivedCny > bankReceivedCny ? '【Topremit】' : '【银行直转】';
 
                     text = `📊 <b>[参考汇率]</b> 10k IDR = ${(baseCnyRate * 10000).toFixed(4)} CNY\n` +
                            `----------------------------------\n` +
-                           `● <b>Topremit 到账:</b> ￥${topremitReceivedCny.toFixed(2)}\n  <small>(扣 100,000 IDR 手续费)</small>\n\n` +
-                           `● <b>银行直转到账:</b> ￥${bankReceivedCny.toFixed(2)}\n  <small>(预估扣 300,000 IDR 境外电汇费)</small>\n` +
+                           `● <b>Topremit 最终到账:</b> ￥${topremitReceivedCny.toFixed(2)}\n  <small style="color:#666;">(已扣除 100,000 IDR 手续费)</small>\n\n` +
+                           `● <b>银行直转最终到账:</b> ￥${bankReceivedCny.toFixed(2)}\n  <small style="color:#666;">(预估扣除 300,000 IDR 境外电汇费)</small>\n` +
                            `----------------------------------\n` +
                            `💡 <b>结论:</b> <span style="color:#007aff;font-weight:bold;">${winner}</span> 更省钱！\n` +
                            `您可多收到约: <span style="color:#28a745;font-weight:bold;">￥${diff.toFixed(2)}</span>`;
                 } else {
-                    // 美元转人民币
                     const topremitReceivedCny = (amount - TOPREMIT_FEE_USD_TO_CNY) * userRate * (1 - TOPREMIT_SPREAD);
-                    const bankReceivedCny = (amount - 25.0) * userRate * (1 - BANK_SPREAD); // 银行境外电汇扣$25中转费
+                    const bankReceivedCny = (amount - 25.0) * userRate * (1 - BANK_SPREAD);
                     const diff = Math.abs(bankReceivedCny - topremitReceivedCny);
                     const winner = topremitReceivedCny > bankReceivedCny ? '【Topremit】' : '【银行直转】';
 
                     text = `📊 <b>[参考汇率]</b> 1 USD = ${userRate.toFixed(4)} CNY\n` +
                            `----------------------------------\n` +
-                           `● <b>Topremit 到账:</b> ￥${topremitReceivedCny.toFixed(2)}\n  <small>(扣 $5 固定手续费)</small>\n\n` +
-                           `● <b>银行直转到账:</b> ￥${bankReceivedCny.toFixed(2)}\n  <small>(预估扣 $25 中转及电汇费)</small>\n` +
+                           `● <b>Topremit 最终到账:</b> ￥${topremitReceivedCny.toFixed(2)}\n  <small style="color:#666;">(已扣除 $5 固定手续费)</small>\n\n` +
+                           `● <b>银行直转最终到账:</b> ￥${bankReceivedCny.toFixed(2)}\n  <small style="color:#666;">(预估扣除 $25 中转及电汇费)</small>\n` +
                            `----------------------------------\n` +
                            `💡 <b>结论:</b> <span style="color:#007aff;font-weight:bold;">${winner}</span> 更省钱！\n` +
                            `您可多收到约: <span style="color:#28a745;font-weight:bold;">￥${diff.toFixed(2)}</span>`;
                 }
             } else {
-                // ==========================================
-                // 【场景：从中国人民币汇款到国外】
-                // ==========================================
                 if (currency === 'IDR') {
-                    // 人民币转印尼盾
                     const bankRate = userRate * (1 - BANK_SPREAD);
                     const bankReceivedIdr = (amount - BANK_FIXED_FEE_CNY) * bankRate;
                     const topremitRate = userRate * (1 - TOPREMIT_SPREAD);
-                    const topremitReceivedIdr = (amount - 50.0) * topremitRate; // 平台人民币手续费约折合50元
+                    const topremitReceivedIdr = (amount - 50.0) * topremitRate;
                     const diff = Math.abs(bankReceivedIdr - topremitReceivedIdr);
                     const winner = topremitReceivedIdr > bankReceivedIdr ? '【Topremit】' : '【银行直转】';
 
                     text = `📊 <b>[参考汇率]</b> 1 CNY = ${userRate.toFixed(2)} IDR\n` +
                            `----------------------------------\n` +
-                           `● <b>银行直转到账:</b> ${Math.round(bankReceivedIdr).toLocaleString()} IDR\n  <small>(扣除约￥150手续费及点差)</small>\n\n` +
-                           `● <b>Topremit 到账:</b> ${Math.round(topremitReceivedIdr).toLocaleString()} IDR\n  <small>(享受平台专享汇率)</small>\n` +
+                           `● <b>银行直转最终到账:</b> ${Math.round(bankReceivedIdr).toLocaleString()} IDR\n  <small style="color:#666;">(已扣除约￥150手续费及点差)</small>\n\n` +
+                           `● <b>Topremit 最终到账:</b> ${Math.round(topremitReceivedIdr).toLocaleString()} IDR\n  <small style="color:#666;">(享受平台专享汇率)</small>\n` +
                            `----------------------------------\n` +
                            `💡 <b>结论:</b> <span style="color:#007aff;font-weight:bold;">${winner}</span> 更省钱！\n` +
+                           `收款人多收到: <span style="color:#28a745;font-weight:bold;">${Math.round(diff).toLocaleString()} IDR</span>`;
+                } else {
+                    const bankRate = userRate * (1 - BANK_SPREAD);
+                    const bankReceivedUsd = (amount - BANK_FIXED_FEE_CNY) * bankRate;
+                    const topremitRate = userRate * (1 - TOPREMIT_SPREAD);
+                    const topremitReceivedUsd = (amount - TOPREMIT_FEE_CNY_TO_USD) * topremitRate;
+                    const diff = Math.abs(bankReceivedUsd - topremitReceivedUsd);
