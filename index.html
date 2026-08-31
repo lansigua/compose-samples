@@ -3,42 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>跨境转账省钱比对工具(全功能修复版)</title>
+    <title>跨境转账省钱比对工具(本地高精算版)</title>
     <style>
         body { font-family: -apple-system, system-ui, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 90vh; flex-direction: column; }
-        .card { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 440px; box-sizing: border-box; }
-        h2 { text-align: center; color: #1c1c1e; margin-top: 0; font-size: 19px; margin-bottom: 15px; }
-        .rate-ticker { background: #1c1c1e; color: #34c759; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-family: monospace; font-size: 13px; line-height: 1.5; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-        .rate-ticker span { color: #ffd60a; font-weight: bold; }
-        .ticker-title { color: #aeaeb2; font-size: 11px; margin-bottom: 4px; text-transform: uppercase; font-weight: bold; }
-        .tab-group { display: flex; background: #e3e3e6; border-radius: 12px; padding: 3px; margin-bottom: 20px; }
+        .card { background: white; padding: 24px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); width: 100%; max-width: 420px; box-sizing: border-box; }
+        h2 { text-align: center; color: #1c1c1e; margin-top: 0; font-size: 20px; margin-bottom: 24px; }
+        .tab-group { display: flex; background: #e3e3e6; border-radius: 12px; padding: 3px; margin-bottom: 24px; }
         .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; border-radius: 9px; font-weight: bold; color: #636366; font-size: 13px; transition: all 0.2s; }
         .tab.active { background: white; color: #007aff; box-shadow: 0 3px 8px rgba(0,0,0,0.1); }
-        .input-group { margin-bottom: 16px; }
-        label { display: block; margin-bottom: 6px; color: #3a3a3c; font-size: 14px; font-weight: 500; }
-        input { width: 100%; padding: 12px; border: 1px solid #d1d1d6; border-radius: 10px; background: #f2f2f7; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.2s; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #3a3a3c; font-size: 14px; font-weight: 500; }
+        input { width: 100%; padding: 14px; border: 1px solid #d1d1d6; border-radius: 10px; background: #f2f2f7; box-sizing: border-box; font-size: 16px; outline: none; transition: border 0.2s; }
         input:focus { border-color: #007aff; background: white; }
-        .radio-group { display: flex; gap: 15px; margin-bottom: 16px; background: #f2f2f7; padding: 12px; border-radius: 10px; flex-wrap: wrap; }
-        .radio-item { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; color: #1c1c1e; }
+        .radio-group { display: flex; gap: 20px; margin-bottom: 16px; background: #f2f2f7; padding: 12px; border-radius: 10px; }
+        .radio-item { display: flex; align-items: center; gap: 6px; font-size: 15px; cursor: pointer; color: #1c1c1e; }
         .radio-item input { width: auto; margin: 0; }
-        button { width: 100%; padding: 14px; background: #007aff; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 5px; box-shadow: 0 4px 12px rgba(0,122,255,0.2); }
+        button { width: 100%; padding: 16px; background: #007aff; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,122,255,0.2); }
         button:hover { background: #0063cc; }
-        #result { margin-top: 20px; padding: 16px; background: #f2f2f7; border-radius: 12px; border-left: 5px solid #007aff; white-space: pre-line; font-size: 14px; color: #1c1c1e; line-height: 1.6; display: none; }
-        .api-status { font-size: 12px; color: #8e8e93; text-align: center; margin-top: 5px; }
+        #result { margin-top: 24px; padding: 18px; background: #f2f2f7; border-radius: 12px; border-left: 5px solid #007aff; white-space: pre-line; font-size: 15px; color: #1c1c1e; line-height: 1.6; display: none; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>跨境转账省钱比对工具</h2>
-        
-        <!-- 🏛️ 国际网联实时大盘与金光/Topremit联动看板 -->
-        <div class="rate-ticker">
-            <div class="ticker-title">🌐 国际网联实时大盘与金光/Topremit联动看板</div>
-            <div id="ticker-usd-idr">• 国际美元大盘：加载中...</div>
-            <div id="ticker-cny-idr">• 🏛️ 金光个人结汇价：1 CNY = <span>2,653.0</span> IDR</div>
-            <div id="ticker-topremit-idr">• 🚀 Topremit 结汇价：1 CNY = <span>2,663.0</span> IDR</div>
-            <div id="ticker-cross-rate">• 国际大盘美元兑人民币: 加载中...</div>
-        </div>
         
         <!-- 1. 选择转账方向 -->
         <div class="tab-group">
@@ -47,135 +34,140 @@
         </div>
 
         <!-- 2. 选择外币币种 -->
-        <label>选择对比的当前外币：</label>
+        <label>选择对比的外币币种：</label>
         <div class="radio-group">
             <label class="radio-item">
-                <input type="radio" name="currency" value="IDR" checked onclick="updateLabelsAndFetchRate()">
-                🇮🇩 印尼盾 (对齐 2653 / 2663)
+                <input type="radio" name="currency" value="IDR" checked onclick="updateLabels()">
+                🇮🇩 印尼盾 (IDR)
             </label>
             <label class="radio-item">
-                <input type="radio" name="currency" value="USD" onclick="updateLabelsAndFetchRate()">
-                🇺🇸 美元兑人民币 (USD/CNY)
-            </label>
-            <label class="radio-item">
-                <input type="radio" name="currency" value="USD_REV" onclick="updateLabelsAndFetchRate()">
-                🇨🇳 人民币兑美元 (CNY/USD)
+                <input type="radio" name="currency" value="USD" onclick="updateLabels()">
+                🇺🇸 美元 (USD)
             </label>
         </div>
 
         <!-- 3. 转账金额和参考汇率输入框 -->
         <div class="input-group">
-            <label id="amount-label">输入汇出金额</label>
-            <input type="number" id="amount" placeholder="请输入要转账的数字金额">
+            <label id="amount-label">输入要转出的总印尼盾金额 (IDR)</label>
+            <input type="number" id="amount" placeholder="例如: 50000000">
         </div>
         <div class="input-group">
-            <label id="rate-label">输入当前参考价</label>
-            <input type="number" id="rate" step="0.0001" placeholder="正在对齐智能汇率...">
+            <label id="rate-label">输入金光银行参考汇率 (1 CNY = ? IDR)</label>
+            <input type="number" id="rate" step="0.0001" placeholder="例如: 2653">
         </div>
 
         <button onclick="calculate()">开始精算比对</button>
         <div id="result"></div>
-        <div id="api-hint" class="api-status">🔄 正在联网同步全球外汇大盘网关...</div>
     </div>
 
     <script>
-        let isTransferToCny = true; 
-        let globalRates = { USD: 15650.0, CNY_BANK: 2653.0, CNY_TOPREMIT: 2663.0, USD_CNY: 6.7207 }; 
+        let isTransferToCny = true; // true: 汇款回中国, false: 人民币汇出国外
 
-        const BANK_FIXED_FEE_CNY = 150.0;   
-        const BANK_SPREAD = 0.012;          
-        const TOPREMIT_FEE_IDR_TO_CNY = 100000.0; 
-        const TOPREMIT_FEE_USD_TO_CNY = 5.0;      
-        const TOPREMIT_FEE_CNY_TO_USD = 35.0;     
-        const TOPREMIT_SPREAD = 0.004;            
+        // 费率常量配置
+        const BANK_FIXED_FEE_CNY = 150.0;   // 银行国内汇出固定电汇费
+        const BANK_SPREAD = 0.012;          // 银行点差损耗 1.2%
+        
+        const TOPREMIT_FEE_IDR_TO_CNY = 100000.0; // Topremit印尼盾转中国固定手续费 [参考1]
+        const TOPREMIT_FEE_USD_TO_CNY = 5.0;      // Topremit美元转中国固定手续费 [参考1]
+        const TOPREMIT_FEE_CNY_TO_USD = 35.0;     // Topremit人民币转境外美元手续费预估
+        const TOPREMIT_SPREAD = 0.004;            // Topremit点差损耗 0.4%
 
         function switchDirection(direction) {
             isTransferToCny = direction;
             document.getElementById('tab-out').classList.toggle('active', direction);
             document.getElementById('tab-in').classList.toggle('active', !direction);
-            updateLabelsAndFetchRate();
+            updateLabels();
         }
 
-        async function fetchRealTimeRatesAndPopulate() {
-            const hintDiv = document.getElementById('api-hint');
-            try {
-                const res = await fetch(`https://exchangerate-api.com`, { method: 'GET' });
-                const data = await res.json();
-                
-                if (data && data.rates) {
-                    const liveUsdIdr = data.rates["IDR"] || 15650.0;
-                    const liveUsdCny = data.rates["CNY"] || 6.7207;
-                    const pureCnyIdr大盘中间价 = liveUsdIdr / liveUsdCny;
-
-                    globalRates.USD = liveUsdIdr;
-                    globalRates.USD_CNY = liveUsdCny;
-                    
-                    // 动态微调估算轴心
-                    globalRates.CNY_BANK = 2653.0 * (liveUsdCny / 6.7207); 
-                    globalRates.CNY_TOPREMIT = 2663.0 * (liveUsdCny / 6.7207); 
-
-                    hintDiv.innerHTML = "✅ 国际实时外汇大盘网关已无缝对接";
-                }
-            } catch (err) {
-                hintDiv.innerHTML = "✅ 正在运行本地真实牌价精算逻辑";
-            }
-            
-            // 强行渲染看板显示，绝不留空
-            document.getElementById('ticker-usd-idr').innerHTML = `• 国际美元大盘：1 USD = <span>${Math.round(globalRates.USD).toLocaleString()}</span> IDR`;
-            document.getElementById('ticker-cny-idr').innerHTML = `• 🏛️ 金光个人结汇价：1 CNY = <span style="color:#ff3b30;">${globalRates.CNY_BANK.toFixed(1)}</span> IDR`;
-            document.getElementById('ticker-topremit-idr').innerHTML = `• 🚀 Topremit 即时结汇价：1 CNY = <span style="color:#34c759;">${globalRates.CNY_TOPREMIT.toFixed(1)}</span> IDR`;
-            document.getElementById('ticker-cross-rate').innerHTML = `• 国际大盘美元兑人民币: <span>${globalRates.USD_CNY.toFixed(4)}</span>`;
-            
-            updateLabelsAndFetchRate();
-        }
-
-        // 🌟 彻底修复核心：重构输入框文本与数值刷新，无论哪种组合都能畅通解锁
-        function updateLabelsAndFetchRate() {
+        function updateLabels() {
             const currencyRadio = document.querySelector('input[name="currency"]:checked');
             const currency = currencyRadio ? currencyRadio.value : 'IDR';
             
             const amountLabel = document.getElementById('amount-label');
             const rateLabel = document.getElementById('rate-label');
-            const rateInput = document.getElementById('rate');
             
             document.getElementById('amount').value = '';
+            document.getElementById('rate').value = '';
             document.getElementById('result').style.display = 'none';
-
-            const usdToCny = globalRates.USD_CNY;
-            const cnyToUsd = 1 / globalRates.USD_CNY;
 
             if (isTransferToCny) {
                 // 外币转人民币(结汇回国)
                 if (currency === 'IDR') {
                     amountLabel.innerText = "输入要转出的总印尼盾金额 (IDR)";
-                    rateLabel.innerText = "确认或校准金光银行结算价 (1 CNY = ? IDR)";
-                    rateInput.value = globalRates.CNY_BANK.toFixed(2);
-                } else if (currency === 'USD') {
-                    amountLabel.innerText = "输入汇出金额 (USD)";
-                    rateLabel.innerText = "当前美元兑人民币大盘汇率 (1 USD = ? CNY)";
-                    rateInput.value = usdToCny.toFixed(4);
+                    rateLabel.innerText = "输入金光银行结算汇率 (1 CNY = ? IDR) [参考: 2653]";
                 } else {
-                    amountLabel.innerText = "输入汇出金额 (CNY)";
-                    rateLabel.innerText = "当前人民币兑美元大盘汇率 (1 CNY = ? USD)";
-                    rateInput.value = cnyToUsd.toFixed(4);
+                    amountLabel.innerText = "输入要转出的美元金额 (USD)";
+                    rateLabel.innerText = "输入当前美元兑人民币汇率 (1 USD = ? CNY) [参考: 6.72]";
                 }
             } else {
                 // 人民币转外币(外汇输出)
                 if (currency === 'IDR') {
-                    amountLabel.innerText = "输入汇出金额 (CNY)";
-                    rateLabel.innerText = "确认或校准金光银行结算价 (1 CNY = ? IDR)";
-                    rateInput.value = globalRates.CNY_BANK.toFixed(2);
-                } else if (currency === 'USD') {
-                    amountLabel.innerText = "输入汇出金额 (CNY)";
-                    rateLabel.innerText = "当前美元兑人民币大盘汇率 (1 USD = ? CNY)";
-                    rateInput.value = usdToCny.toFixed(4);
+                    amountLabel.innerText = "输入汇出人民币金额 (CNY)";
+                    rateLabel.innerText = "输入目标参考汇率 (1 CNY = ? IDR) [参考: 2185]";
                 } else {
-                    amountLabel.innerText = "输入汇出金额 (CNY)";
-                    rateLabel.innerText = "当前人民币兑美元大盘汇率 (1 CNY = ? USD)";
-                    rateInput.value = cnyToUsd.toFixed(4);
+                    amountLabel.innerText = "输入汇出人民币金额 (CNY)";
+                    rateLabel.innerText = "输入目标参考汇率 (1 CNY = ? USD) [参考: 0.148]";
                 }
             }
         }
 
         function calculate() {
             const amount = parseFloat(document.getElementById('amount').value);
+            const userRate = parseFloat(document.getElementById('rate').value);
+            const currencyRadio = document.querySelector('input[name="currency"]:checked');
+            const currency = currencyRadio ? currencyRadio.value : 'IDR';
+            const resultDiv = document.getElementById('result');
+
+            if (!amount || amount <= 0 || !userRate || userRate <= 0) {
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = '⚠️ 请输入有效的转账金额和当前参考汇率';
+                return;
+            }
+
+            let text = '';
+
+            if (isTransferToCny) {
+                // ==========================================
+                // 【外币转回中国结汇成人民币 CNY】
+                // ==========================================
+                if (currency === 'IDR') {
+                    // 银行直转：扣除境外预估30万IDR电汇费，除以你手输的银行结算价（如2653）
+                    const bankReceivedCny = (amount - 300000.0) / userRate;
+                    // Topremit：扣除10万固定手续费，按你输入的价格加成更优的10点（如2663）进行精算
+                    const topremitRate = userRate + 10.0;
+                    const topremitReceivedCny = (amount - TOPREMIT_FEE_IDR_TO_CNY) / topremitRate;
+                    const diff = Math.abs(bankReceivedCny - topremitReceivedCny);
+                    const winner = topremitReceivedCny > bankReceivedCny ? '【Topremit】' : '【银行直转】';
+
+                    text = `📈 <b>[比对汇率]</b> 银行: ${userRate} | Topremit联动: ${topremitRate}\n` +
+                           `----------------------------------\n` +
+                           `● <b>银行直转最终到账:</b> ￥${bankReceivedCny.toFixed(2)}\n  <small style="color:#666;">(预估扣 300,000 IDR 境外电汇费)</small>\n\n` +
+                           `● <b>Topremit 最终到账:</b> ￥${topremitReceivedCny.toFixed(2)}\n  <small style="color:#666;">(已扣除 100,000 IDR 固定手续费)</small>\n` +
+                           `----------------------------------\n` +
+                           `💡 <b>结论:</b> <span style="color:#007aff;font-weight:bold;">${winner}</span> 更省钱！\n` +
+                           `您可多收到约: <span style="color:#28a745;font-weight:bold;">￥${diff.toFixed(2)}</span>`;
+                } else {
+                    // 美元转人民币
+                    const topremitReceivedCny = (amount - TOPREMIT_FEE_USD_TO_CNY) * userRate * (1 - TOPREMIT_SPREAD);
+                    const bankReceivedCny = (amount - 25.0) * userRate * (1 - BANK_SPREAD);
+                    const diff = Math.abs(bankReceivedCny - topremitReceivedCny);
+                    const winner = topremitReceivedCny > bankReceivedCny ? '【Topremit】' : '【银行直转】';
+
+                    text = `📊 <b>[输入汇率]</b> 1 USD = ${userRate.toFixed(4)} CNY\n` +
+                           `----------------------------------\n` +
+                           `● <b>Topremit 最终到账:</b> ￥${topremitReceivedCny.toFixed(2)}\n  <small style="color:#666;">(已扣除 $5 固定手续费)</small>\n\n` +
+                           `● <b>银行直转最终到账:</b> ￥${bankReceivedCny.toFixed(2)}\n  <small style="color:#666;">(预估扣除 $25 中转及电汇费)</small>\n` +
+                           `----------------------------------\n` +
+                           `💡 <b>结论:</b> <span style="color:#007aff;font-weight:bold;">${winner}</span> 更省钱！\n` +
+                           `您可多收到约: <span style="color:#28a745;font-weight:bold;">￥${diff.toFixed(2)}</span>`;
+                }
+            } else {
+                // ==========================================
+                // 【从中国人民币汇款到国外】
+                // ==========================================
+                if (currency === 'IDR') {
+                    const bankRate = userRate * (1 - BANK_SPREAD);
+                    const bankReceivedIdr = (amount - BANK_FIXED_FEE_CNY) * bankRate;
+                    const topremitRate = userRate * (1 - TOPREMIT_SPREAD);
+                    const topremitReceivedIdr = (amount - 50.0) * topremitRate;
+                    const diff = Math.abs(bankReceivedIdr - topremitReceivedIdr);
